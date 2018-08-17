@@ -19,7 +19,8 @@ public class frmDisplay extends javax.swing.JFrame {
     /**
      * Creates new form frmDisplay
      */
-    boolean isNewNumber;
+    boolean appendable=true;
+    boolean isPreviousUnary;
     char preOpp;
     double preNum;
     double tmp = 0;
@@ -27,8 +28,7 @@ public class frmDisplay extends javax.swing.JFrame {
 
     public frmDisplay() {
         initComponents();
-        Image img = new ImageIcon("icon.png").getImage().
-                    getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        Image img = new ImageIcon("icon.png").getImage();
         this.setIconImage(img);
     }
 
@@ -56,13 +56,14 @@ public class frmDisplay extends javax.swing.JFrame {
 
     private void actOnNumber(char num) {
         //reset text field
-        if (isNewNumber || txtDisplay.getText().equals("0") && num != '.') {
+        if (!appendable || txtDisplay.getText().equals("0") && num != '.') {
             txtDisplay.setText(num + "");
         } //append text field
         else {
             txtDisplay.setText(txtDisplay.getText() + num);
         }
-        isNewNumber = false;
+        appendable = true;
+        txtDisplay.requestFocusInWindow();
     }
 
     private String round(double input) {
@@ -81,7 +82,7 @@ public class frmDisplay extends javax.swing.JFrame {
 
     private void actOnOpp(char o) {
         //override previous operator
-        if(isNewNumber)
+        if(!appendable)
         {
             opp = o;
         }
@@ -92,10 +93,10 @@ public class frmDisplay extends javax.swing.JFrame {
 
             txtDisplay.setText(round(result));
             tmp = result;
-            isNewNumber = true;
+            appendable = false;
             opp = o;
         }
-        
+        txtDisplay.requestFocusInWindow();
     }
 
     /**
@@ -487,7 +488,7 @@ public class frmDisplay extends javax.swing.JFrame {
     private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEqualActionPerformed
         // TODO add your handling code here:
         actOnEqual();
-
+        txtDisplay.requestFocusInWindow();
     }//GEN-LAST:event_btnEqualActionPerformed
 
     private void btnNegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNegActionPerformed
@@ -504,7 +505,7 @@ public class frmDisplay extends javax.swing.JFrame {
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
         // TODO add your handling code here:
-        if(!isNewNumber)
+        if(!!appendable)
         {
             String display = txtDisplay.getText();
             display = display.substring(0, display.length()-1);
@@ -523,7 +524,7 @@ public class frmDisplay extends javax.swing.JFrame {
 
     private void btnClearScreenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearScreenActionPerformed
         // TODO add your handling code here:   
-        if(!isNewNumber)
+        if(!!appendable)
             txtDisplay.setText("0");
         txtDisplay.requestFocusInWindow();
     }//GEN-LAST:event_btnClearScreenActionPerformed
@@ -553,7 +554,7 @@ public class frmDisplay extends javax.swing.JFrame {
                     valid = false;
                 break;
         }
-        isNewNumber = true;
+        isPreviousUnary = true;
         txtDisplay.requestFocusInWindow();
         if(valid)
             return round(kq);
