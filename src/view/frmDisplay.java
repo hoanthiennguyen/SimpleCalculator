@@ -383,6 +383,7 @@ public class frmDisplay extends javax.swing.JFrame {
     private void txtDisplayKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDisplayKeyTyped
         // TODO add your handling code here:        
         char c = evt.getKeyChar();
+        String screen = txtDisplay.getText();
         //processing operator key
         if (c == '+' || c == '-' || c == '*' || c == '/') {
             actOnOpp(c);
@@ -390,7 +391,7 @@ public class frmDisplay extends javax.swing.JFrame {
         if (c == '='||c == '\n') {
             actOnEqual();
         }
-        boolean valid = (c >= '0' && c <= '9' || c == '.');
+        boolean valid = (c >= '0' && c <= '9' || c == '.' && !screen.contains("."));
         //processing numberic key
         if (valid)
             actOnNumber(c);
@@ -450,7 +451,8 @@ public class frmDisplay extends javax.swing.JFrame {
 
     private void btnDotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDotActionPerformed
         // TODO add your handling code here:
-        actOnNumber('.');
+        if(!txtDisplay.getText().contains("."))
+            actOnNumber('.');
     }//GEN-LAST:event_btnDotActionPerformed
 
     private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusActionPerformed
@@ -505,7 +507,7 @@ public class frmDisplay extends javax.swing.JFrame {
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
         // TODO add your handling code here:
-        if(!!appendable)
+        if(appendable)
         {
             String display = txtDisplay.getText();
             display = display.substring(0, display.length()-1);
@@ -524,13 +526,13 @@ public class frmDisplay extends javax.swing.JFrame {
 
     private void btnClearScreenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearScreenActionPerformed
         // TODO add your handling code here:   
-        if(!!appendable)
+        if(appendable)
             txtDisplay.setText("0");
         txtDisplay.requestFocusInWindow();
     }//GEN-LAST:event_btnClearScreenActionPerformed
     private String actOnUnary(String oo)
     {
-        boolean valid = true;
+        boolean valid = true;        
         double display = Double.parseDouble(txtDisplay.getText());
         double kq = 0;
         switch(oo)
@@ -557,7 +559,12 @@ public class frmDisplay extends javax.swing.JFrame {
         isPreviousUnary = true;
         txtDisplay.requestFocusInWindow();
         if(valid)
+        {
+            //if the previous operator is 'equal', make the display number become tmp
+            if(opp == '=')
+                tmp = kq;
             return round(kq);
+        }
         else
             return "error";
         
