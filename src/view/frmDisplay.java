@@ -1,8 +1,5 @@
 package view;
 
-import java.awt.Image;
-import javax.swing.ImageIcon;
-
 
 
 /*
@@ -27,9 +24,6 @@ public class frmDisplay extends javax.swing.JFrame {
 
     public frmDisplay() {
         initComponents();
-        Image img = new ImageIcon("icon.png").getImage().
-                    getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-        this.setIconImage(img);
     }
 
     private double calculate(double d1, double d2, char o) {
@@ -56,7 +50,7 @@ public class frmDisplay extends javax.swing.JFrame {
 
     private void actOnNumber(char num) {
         //reset text field
-        if (isNewNumber || txtDisplay.getText().equals("0") && num != '.') {
+        if (isNewNumber || txtDisplay.getText().equals("0")) {
             txtDisplay.setText(num + "");
         } //append text field
         else {
@@ -135,7 +129,6 @@ public class frmDisplay extends javax.swing.JFrame {
         btnEqual = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Calculator");
 
         txtDisplay.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         txtDisplay.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -358,7 +351,7 @@ public class frmDisplay extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtDisplay)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 246, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -368,7 +361,7 @@ public class frmDisplay extends javax.swing.JFrame {
                 .addComponent(txtDisplay, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(49, 49, 49)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         pack();
@@ -499,7 +492,6 @@ public class frmDisplay extends javax.swing.JFrame {
             display = '-' + display;
         }
         txtDisplay.setText(display);
-        txtDisplay.requestFocusInWindow();
     }//GEN-LAST:event_btnNegActionPerformed
 
     private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
@@ -510,26 +502,23 @@ public class frmDisplay extends javax.swing.JFrame {
             display = display.substring(0, display.length()-1);
             txtDisplay.setText(display);
         }
-        txtDisplay.requestFocusInWindow();
     }//GEN-LAST:event_btnDelActionPerformed
 
     private void btnClearAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearAllActionPerformed
         // TODO add your handling code here:
         txtDisplay.setText("0");
-        txtDisplay.requestFocusInWindow();
         opp = '=';
         tmp = 0;
     }//GEN-LAST:event_btnClearAllActionPerformed
 
     private void btnClearScreenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearScreenActionPerformed
-        // TODO add your handling code here:   
+        // TODO add your handling code here:
         if(!isNewNumber)
             txtDisplay.setText("0");
-        txtDisplay.requestFocusInWindow();
     }//GEN-LAST:event_btnClearScreenActionPerformed
     private String actOnUnary(String oo)
     {
-        boolean valid = true;
+        String result = null;
         double display = Double.parseDouble(txtDisplay.getText());
         double kq = 0;
         switch(oo)
@@ -541,7 +530,7 @@ public class frmDisplay extends javax.swing.JFrame {
                 if(display >= 0)
                     kq = Math.sqrt(display);
                 else
-                    valid = false;
+                    result = "error";
                 break;
             case "%":
                 kq = display/100;
@@ -550,12 +539,11 @@ public class frmDisplay extends javax.swing.JFrame {
                 if(display != 0)
                     kq = 1/display;
                 else
-                    valid = false;
+                    result = "error";
                 break;
         }
         isNewNumber = true;
-        txtDisplay.requestFocusInWindow();
-        if(valid)
+        if(result == null)
             return round(kq);
         else
             return "error";
