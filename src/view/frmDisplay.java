@@ -20,7 +20,6 @@ public class frmDisplay extends javax.swing.JFrame {
      * Creates new form frmDisplay
      */
     boolean appendable=true;
-    boolean isPreviousUnary;
     char preOpp;
     double preNum;
     double tmp = 0;
@@ -53,7 +52,20 @@ public class frmDisplay extends javax.swing.JFrame {
         }
         return result;
     }
-
+    private double calculateUnary(double dd,String oo){
+        switch(oo)
+        {
+            case "square":
+                return dd*dd;
+            case "sqrt":
+                return Math.sqrt(dd);
+            case "%":
+                return dd/100;
+            case "1/x":
+                return 1/dd;
+        }
+        return 0;
+    }
     private void actOnNumber(char num) {
         //reset text field
         if (!appendable || txtDisplay.getText().equals("0") && num != '.') {
@@ -64,6 +76,82 @@ public class frmDisplay extends javax.swing.JFrame {
         }
         appendable = true;
         txtDisplay.requestFocusInWindow();
+    }
+    private void actOnOpp(char o) {
+        String screen = txtDisplay.getText();
+        //only perform when screen's contain is not 'error'
+        if(!screen.contains("Error"))
+        {            
+            if(appendable)
+            {                
+                double d2 = Double.parseDouble(screen);
+                //Exception divided by zero
+                if(d2 == 0 && opp == '/')
+                {
+                    txtDisplay.setText("Error: divided by zero");
+                    opp  = '=';
+                    tmp = 0;
+                }
+                    
+                else
+                {
+                    double result = calculate(tmp, d2, opp);
+                    txtDisplay.setText(round(result));
+                    tmp = result;                  
+                    opp = o;
+                }   
+            }
+            //override previous operator
+            else
+            {
+                opp = o;                          
+            }
+            
+        }
+        appendable = false;
+        txtDisplay.requestFocusInWindow();
+
+    }
+    private void actOnUnary(String oo)
+    {
+        String screen = txtDisplay.getText();
+        if(!screen.contains("Error"))
+        {                        
+            double display = Double.parseDouble(screen);
+            String result;
+            if(display < 0 && oo.equals("sqrt"))
+                result = "Error: Square root of negative number";
+            else if(display == 0 && oo.equals("1/x"))
+                result = "Error: Divided by zero";
+            else
+            {
+                //if the previous operator is 'equal', update the display number into 'tmp'
+                if( opp == '=')
+                    tmp = calculateUnary(display, oo);
+                result = round(calculateUnary(display, oo));
+            }            
+            txtDisplay.setText(result);
+        }
+        appendable = false;
+        txtDisplay.requestFocusInWindow();
+    }
+    private void actOnEqual()
+    {
+        //if double button equal were typed, continue to calculate with previous
+        //operand and previous operater
+        if (opp == '=' && !appendable) 
+        {
+            double result = calculate(tmp, preNum, preOpp);
+            tmp = result;
+            txtDisplay.setText(round(result));
+        }
+        //store previous operator and previous operand in case of reuse
+        else
+        {
+            preNum = Double.parseDouble(txtDisplay.getText());
+            preOpp = opp;
+            actOnOpp('=');
+        }
     }
 
     private String round(double input) {
@@ -78,27 +166,7 @@ public class frmDisplay extends javax.swing.JFrame {
             result = result.substring(0, index);
         }
         return result;
-    }
-
-    private void actOnOpp(char o) {
-        //override previous operator
-        if(!appendable)
-        {
-            opp = o;
-        }
-        else
-        {
-            double d2 = Double.parseDouble(txtDisplay.getText());
-            double result = calculate(tmp, d2, opp);
-
-            txtDisplay.setText(round(result));
-            tmp = result;
-            appendable = false;
-            opp = o;
-        }
-        txtDisplay.requestFocusInWindow();
-    }
-
+    }    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -469,24 +537,7 @@ public class frmDisplay extends javax.swing.JFrame {
         // TODO add your handling code here:
         actOnOpp('/');
     }//GEN-LAST:event_btnDivideActionPerformed
-    private void actOnEqual()
-    {
-        //if double button equal were typed, continue to calculate with previous
-        //operand and previous operater
-        if (opp == '=') 
-        {
-            double result = calculate(tmp, preNum, preOpp);
-            tmp = result;
-            txtDisplay.setText(round(result));
-        }
-        //store previous operator and previous operand in case of reuse
-        else
-        {
-            preNum = Double.parseDouble(txtDisplay.getText());
-            preOpp = opp;
-            actOnOpp('=');
-        }
-    }
+    
     private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEqualActionPerformed
         // TODO add your handling code here:
         actOnEqual();
@@ -530,64 +581,25 @@ public class frmDisplay extends javax.swing.JFrame {
             txtDisplay.setText("0");
         txtDisplay.requestFocusInWindow();
     }//GEN-LAST:event_btnClearScreenActionPerformed
-    private String actOnUnary(String oo)
-    {
-        boolean valid = true;        
-        double display = Double.parseDouble(txtDisplay.getText());
-        double kq = 0;
-        switch(oo)
-        {
-            case "square":
-                kq = display*display;
-                break;
-            case "sqrt":
-                if(display >= 0)
-                    kq = Math.sqrt(display);
-                else
-                    valid = false;
-                break;
-            case "%":
-                kq = display/100;
-                break;
-            case "1/x":
-                if(display != 0)
-                    kq = 1/display;
-                else
-                    valid = false;
-                break;
-        }
-        isPreviousUnary = true;
-        txtDisplay.requestFocusInWindow();
-        if(valid)
-        {
-            //if the previous operator is 'equal', make the display number become tmp
-            if(opp == '=')
-                tmp = kq;
-            return round(kq);
-        }
-        else
-            return "error";
-        
-    }
+    
     private void btnSquareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSquareActionPerformed
-        // TODO add your handling code here:
-        
-        txtDisplay.setText(actOnUnary("square"));
+        // TODO add your handling code here:       
+        actOnUnary("square");
     }//GEN-LAST:event_btnSquareActionPerformed
 
     private void btnSqrtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSqrtActionPerformed
         // TODO add your handling code here:
-        txtDisplay.setText(actOnUnary("sqrt"));
+        actOnUnary("sqrt");
     }//GEN-LAST:event_btnSqrtActionPerformed
 
     private void btnPercentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPercentActionPerformed
         // TODO add your handling code here:
-        txtDisplay.setText(actOnUnary("%"));
+        actOnUnary("%");
     }//GEN-LAST:event_btnPercentActionPerformed
 
     private void btnReverseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReverseActionPerformed
         // TODO add your handling code here:
-        txtDisplay.setText(actOnUnary("1/x"));
+        actOnUnary("1/x");
             
     }//GEN-LAST:event_btnReverseActionPerformed
 
